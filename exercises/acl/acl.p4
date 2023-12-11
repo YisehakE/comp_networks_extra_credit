@@ -147,6 +147,19 @@ control MyIngress(inout headers hdr,
         default_action = drop();
     }
 
+    table acl_ternary {
+      key = {
+          hdr.ipv4.dstAddr: ternary;
+          hdr.udp.dstPort: ternary; 
+      }
+      actions = {
+          drop;
+          NoAction;
+      }
+      size = 1024;
+      default_action = NoAction();
+    }
+
     /* TODO: Create a table for access control list.
        Hints: Use ipv4_lpm table as an example.
        Hints: The table should have the following specification
@@ -166,9 +179,8 @@ control MyIngress(inout headers hdr,
         if (hdr.ipv4.isValid()) {
             ipv4_lpm.apply();
             /* TODO: add your table to the control flow */
-
+	          acl_ternary.apply();
         }
-
     }
 }
 
